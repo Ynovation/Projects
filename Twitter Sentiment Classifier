@@ -1,0 +1,63 @@
+open_file = open("project_twitter_data.csv", "r")
+resulting_data = open("resulting_data.csv", "w")
+
+resulting_data.write("Number of Retweets, Number of Replies, Positive Score, Negative Score, Net Score")
+resulting_data.write("\n")
+
+punctuation_chars = ["'", '"', ",", ".", "!", ":", ";", '#', '@']
+
+def strip_punctuation(word):
+    nword = word
+    for punctuation in punctuation_chars:
+        nword = nword.replace(punctuation,"")
+    return nword
+
+# list of positive words to use
+positive_words = []
+with open("positive_words.txt") as pos_f:
+    for lin in pos_f:
+        if lin[0] != ';' and lin[0] != '\n':
+            positive_words.append(lin.strip())
+
+def get_pos(sentence):
+    nopunc_words = strip_punctuation(sentence)
+    small_words = nopunc_words.lower()
+    word_lst = small_words.split()
+    pos_occurence = 0
+    for word in word_lst:
+        if word in positive_words:
+            pos_occurence += 1
+    return pos_occurence            
+
+negative_words = []
+with open("negative_words.txt") as pos_f:
+    for lin in pos_f:
+        if lin[0] != ';' and lin[0] != '\n':
+            negative_words.append(lin.strip())
+
+def get_neg(sentence):
+    nopunc_words = strip_punctuation(sentence)
+    small_words = nopunc_words.lower()
+    word_lst = small_words.split()
+    neg_occurence = 0
+    for word in word_lst:
+        if word in negative_words:
+            neg_occurence += 1
+    return neg_occurence
+
+
+#CODE to open twitter data
+
+
+
+linesPTDF =  open_file.readlines()
+headerDontUsed= linesPTDF.pop(0)
+
+
+for linesTD in linesPTDF:
+    listTD = linesTD.strip().split(",")
+    resulting_data.write("{}, {}, {}, {}, {}".format(listTD[1], listTD[2], get_pos(listTD[0]), get_neg(listTD[0]), (get_pos(listTD[0])-get_neg(listTD[0]))))    
+    resulting_data.write("\n")
+    
+open_file.close()
+resulting_data.close()
